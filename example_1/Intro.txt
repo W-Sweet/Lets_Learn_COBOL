@@ -1,0 +1,9 @@
+Hello, and welcome to Lets_Learn_COBOL, an interactive course intending to teach the basics of COBOL as well as JCL.
+For this project, we will be using the Hercules emulator to emulate mainframe architectures. 
+You can download the Hercules emulator at http://www.hercules-390.org/. On their website is a guide to instillation, as well as a reference summary which we will be refrencing. 
+Now, we will briefly jump into our first two files, Hello.cbl (our first COBOL file), as well as RunHello.jcl (our first JCL) file.
+
+The COBOL source file serves as the architectural blueprint of your application, written in a human-readable, English-like syntax that defines the program’s logic and data structures. 
+In contrast, the JCL file acts as the project manager, providing the mainframe's operating system with the specific instructions needed to handle that code. 
+While the COBOL file describes what the program should do (like printing a message), the JCL describes how the system should prepare the environment—identifying which compiler to use, where to find the source code, and where to send the final output. 
+Without the JCL, the mainframe wouldn’t know how to transform your text-based COBOL instructions into a running process.
