@@ -3,6 +3,15 @@ For this project, we will be using the Hercules emulator to emulate mainframe ar
 You can download the Hercules emulator at http://www.hercules-390.org/. On their website is a guide to instillation, as well as a reference summary which we will be refrencing. 
 Now, we will briefly jump into our first two files, Hello.cbl (our first COBOL file), as well as RunHello.jcl (our first JCL) file.
 
+Once you have downloaded and installed Hercules, open up your terminal and just type the command 'hercules'. This should open the hercules emulator, after the emulator is done opening, press esc and you should see something like the first image that I have attached ("Hercules_After_ESC").
+Next, now that we have hercules which will be able to mimic the hardware of IBM, we will need something to be able to run the hardware, or something to mimic IBM's MVS, for this we will use Tur(n)key 4, a MVS emulator.
+To install MVS, simply run following command below as well as install tk4-_v1.00.zip from the website below, and make sure to take a look at the Users_Manual which is also attached below.
+
+https://wotho.pebble-beach.ch/tk4-/
+
+sudo apt-get update -y
+sudo apt-get install -y x3270 for getting x3270
+
 The COBOL source file serves as the architectural blueprint of your application, written in a human-readable, English-like syntax that defines the program’s logic and data structures. 
 In contrast, the JCL file acts as the project manager, providing the mainframe's operating system with the specific instructions needed to handle that code. 
 While the COBOL file describes what the program should do (like printing a message), the JCL describes how the system should prepare the environment—identifying which compiler to use, where to find the source code, and where to send the final output. 
