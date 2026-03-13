@@ -12,6 +12,11 @@ https://wotho.pebble-beach.ch/tk4-/
 sudo apt-get update -y
 sudo apt-get install -y x3270 for getting x3270
 
+
+
+MAKE SURE YOU ARE IN WSL
+
+
 The COBOL source file serves as the architectural blueprint of your application, written in a human-readable, English-like syntax that defines the program’s logic and data structures. 
 In contrast, the JCL file acts as the project manager, providing the mainframe's operating system with the specific instructions needed to handle that code. 
 While the COBOL file describes what the program should do (like printing a message), the JCL describes how the system should prepare the environment—identifying which compiler to use, where to find the source code, and where to send the final output. 

@@ -1,23 +1,11 @@
-IDENTIFICATION DIVISION.
+       IDENTIFICATION DIVISION.
        PROGRAM-ID. HELLO.
-      *----------------------------------------------------------------
-      * UPGRADED HELLO WORLD - DEMONSTRATES WORKING-STORAGE VARIABLES
-      *----------------------------------------------------------------
-
        ENVIRONMENT DIVISION.
 
        DATA DIVISION.
        WORKING-STORAGE SECTION.
       *----------------------------------------------------------------
       * VARIABLES ARE DEFINED HERE IN WORKING-STORAGE.
-      * 01 IS THE HIGHEST LEVEL NUMBER - THINK OF IT AS A "RECORD"
-      * 05 IS A FIELD (CHILD) WITHIN THAT RECORD.
-      * PIC STANDS FOR "PICTURE" - IT DESCRIBES THE TYPE AND SIZE
-      * OF THE DATA THE VARIABLE WILL HOLD.
-      *
-      * PIC X(20)  = A STRING UP TO 20 CHARACTERS WIDE
-      * PIC 9(3)   = A WHOLE NUMBER UP TO 3 DIGITS (000-999)
-      * PIC 9(3)V99 = A DECIMAL NUMBER (3 digits, 2 after decimal)
       *----------------------------------------------------------------
            01 WS-STUDENT-RECORD.
                05 WS-STUDENT-NAME     PIC X(20) VALUE 'WILL'.
@@ -27,15 +15,18 @@ IDENTIFICATION DIVISION.
            01 WS-GREETING             PIC X(40) VALUE SPACES.
            01 WS-COURSE-NAME          PIC X(30) VALUE 'LETS LEARN COBOL'.
 
+      *----------------------------------------------------------------
+      * ARRAY EXAMPLE (TABLE IN COBOL)
+      * OCCURS 5 TIMES CREATES 5 ELEMENTS IN THE ARRAY
+      *----------------------------------------------------------------
+           01 WS-GRADES.
+               05 WS-GRADE PIC 9(3) OCCURS 5 TIMES
+                  VALUE 85 90 88 92 95.
+
+           01 WS-INDEX PIC 9 VALUE 1.
+
        PROCEDURE DIVISION.
-      *----------------------------------------------------------------
-      * THE PROCEDURE DIVISION IS WHERE PROGRAM LOGIC LIVES.
-      * MOVE COPIES A VALUE INTO A VARIABLE.
-      * STRING CONCATENATES MULTIPLE VALUES INTO ONE VARIABLE.
-      *   - DELIMITED BY SIZE MEANS "USE THE FULL FIELD WIDTH"
-      *   - INTO SPECIFIES THE DESTINATION VARIABLE
-      * DISPLAY PRINTS A VALUE TO THE SCREEN.
-      *----------------------------------------------------------------
+
            MOVE 'WELCOME TO ' TO WS-GREETING
 
            STRING 'WELCOME TO ' DELIMITED BY SIZE
@@ -48,6 +39,17 @@ IDENTIFICATION DIVISION.
            DISPLAY 'STUDENT NAME : ' WS-STUDENT-NAME.
            DISPLAY 'STUDENT AGE  : ' WS-STUDENT-AGE.
            DISPLAY 'STUDENT GPA  : ' WS-STUDENT-GPA.
+           DISPLAY '----------------------------------------'.
+
+      *----------------------------------------------------------------
+      * LOOP THROUGH THE ARRAY AND PRINT EACH GRADE
+      *----------------------------------------------------------------
+           DISPLAY 'STUDENT GRADES:'.
+
+           PERFORM VARYING WS-INDEX FROM 1 BY 1 UNTIL WS-INDEX > 5
+               DISPLAY 'GRADE ' WS-INDEX ' : ' WS-GRADE(WS-INDEX)
+           END-PERFORM.
+
            DISPLAY '----------------------------------------'.
 
            STOP RUN.
