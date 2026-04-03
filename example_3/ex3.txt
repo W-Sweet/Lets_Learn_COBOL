@@ -1,0 +1,7 @@
+This example demonstrates how a COBOL program connects to a relational database using embedded SQL,
+commonly known as DB2 SQL in mainframe environments. The JCL file (EX3.JCL) drives the process
+through three job steps: first the DB2 precompiler (DSNHPC) processes the COBOL source and replaces
+embedded SQL statements with CALL instructions while producing a Database Request Module (DBRM),
+then the IBM COBOL compiler and linker (IGYWCL) compile and link the precompiled source into an
+executable load module, and finally IKJEFT01 runs a DB2 BIND to register the DBRM into a plan
+before executing the program in batch.
