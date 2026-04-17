@@ -1,16 +1,39 @@
 <!doctype html>
-
 <html lang="en">
 <head>
   <meta charset="utf-8">
-
-  <title>Lets Learn Cobol</title>
+  <title>Lets Learn COBOL</title>
+  <style>
+    #text-container {
+      border: 1px solid #ccc;
+      padding: 1rem;
+      min-height: 100px;
+      white-space: pre-wrap;
+      font-family: monospace;
+      display: none;
+    }
+    #example-controls { margin: 1rem 0; }
+  </style>
 </head>
-<body>  
-<p> testing to display text from other file </p>
+<body>
+  <h1>Let's Learn COBOL</h1>
 
-<pre id="text-container"></pre>
+  <div id="example-controls">
+    <label for="example-select">Choose an example:</label>
+    <select id="example-select">
+      <option value="">-- Select --</option>
+      <option value="1">Example 1 – Intro</option>
+      <option value="2">Example 2</option>
+      <option value="3">Example 3</option>
+    </select>
 
-<iframe src="/static/ex2WEBSITE.txt" width="100%" height="400px"></iframe>
+    <button id="showExample">Show Example</button>
+    <button id="prevExample">◀ Prev</button>
+    <button id="nextExample">Next ▶</button>
+  </div>
 
+  <pre id="text-container"></pre>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
+</html>
