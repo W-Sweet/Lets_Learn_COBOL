@@ -1,0 +1,5 @@
+This basic example shows Hello World in COBOL and JCL. 
+
+
+http://www.hercules-390.org/
+https://wotho.pebble-beach.ch/tk4-/

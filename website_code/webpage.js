@@ -19,6 +19,7 @@ function loadExample(num) {
 
 document.getElementById('showExample').addEventListener('click', function () {
   loadExample(select.value);
+  console.log('pressing show example button');
 });
 
 document.getElementById('prevExample').addEventListener('click', function () {
