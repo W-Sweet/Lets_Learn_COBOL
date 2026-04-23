@@ -123,15 +123,33 @@ IDENTIFICATION DIVISION.
            WRITE REPORT-LINE FROM SPACES
            WRITE REPORT-LINE
                FROM "--- SUMMARY ---"
+           MOVE "Records   : " TO REPORT-LINE
+           STRING REPORT-LINE DELIMITED BY "  "
+                  WS-DISP-COUNT DELIMITED BY SIZE
+                  INTO REPORT-LINE
+           END-STRING
            WRITE REPORT-LINE
-               FROM "Records   : " & WS-DISP-COUNT
+           MOVE "Total     : " TO REPORT-LINE
+           STRING REPORT-LINE DELIMITED BY "  "
+                  WS-DISP-TOTAL DELIMITED BY SIZE
+                  INTO REPORT-LINE
+           END-STRING
            WRITE REPORT-LINE
-               FROM "Total     : " & WS-DISP-TOTAL
+           MOVE "Average   : " TO REPORT-LINE
+           STRING REPORT-LINE DELIMITED BY "  "
+                  WS-DISP-AVERAGE DELIMITED BY SIZE
+                  INTO REPORT-LINE
+           END-STRING
            WRITE REPORT-LINE
-               FROM "Average   : " & WS-DISP-AVERAGE
-           WRITE REPORT-LINE
-               FROM "Top Sale  : " & WS-DISP-HIGH
-                    & "  (" & WS-HIGH-SALESPERSON & ")".
+           MOVE "Top Sale  : " TO REPORT-LINE
+           STRING REPORT-LINE DELIMITED BY "  "
+                  WS-DISP-HIGH DELIMITED BY "  "
+                  "  (" DELIMITED BY SIZE
+                  WS-HIGH-SALESPERSON DELIMITED BY "  "
+                  ")" DELIMITED BY SIZE
+                  INTO REPORT-LINE
+           END-STRING
+           WRITE REPORT-LINE.
 
        9000-TERMINATE.
            CLOSE SALES-FILE
