@@ -1,20 +1,36 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <title>Lets Learn COBOL</title>
   <style>
     #text-container {
+      display: none;
+      flex-direction: row;
+      gap: 1rem;
+    }
+
+    .pane {
+      flex: 1;
       border: 1px solid #ccc;
       padding: 1rem;
-      min-height: 100px;
+      min-height: 200px;
+      overflow-x: auto;
+    }
+
+    .pane pre {
       white-space: pre-wrap;
       font-family: monospace;
-      display: none;
+      margin: 0;
     }
-    #example-controls { margin: 1rem 0; }
+
+    #example-controls {
+      margin: 1rem 0;
+    }
   </style>
 </head>
+
 <body>
   <h1>Let's Learn COBOL</h1>
 
@@ -22,9 +38,10 @@
     <label for="example-select">Choose an example:</label>
     <select id="example-select">
       <option value="">-- Select --</option>
-      <option value="1">Example 1 – Intro</option>
-      <option value="2">Example 2</option>
-      <option value="3">Example 3</option>
+      <option value="1">Example 0 – Intro</option>
+      <option value="2">Example 1 - Basics</option>
+      <option value="3">Example 2 - File I/O</option>
+      <option value="4">Example 3 - SQL</option>
     </select>
 
     <button id="showExample">Show Example</button>
@@ -32,8 +49,18 @@
     <button id="nextExample">Next ▶</button>
   </div>
 
-  <pre id="text-container"></pre>
+  <div id="text-container">
+    <div class="pane">
+      <h3 id="left-title"></h3>
+      <pre id="left-content"></pre>
+    </div>
+    <div class="pane">
+      <h3 id="right-title"></h3>
+      <pre id="right-content"></pre>
+    </div>
+  </div>
 
-  <script src="{{ url_for('static', filename='script.js') }}"></script>
+  <script src="{{ url_for('static', filename='webpage.js') }}"></script>
 </body>
+
 </html>
