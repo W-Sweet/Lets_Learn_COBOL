@@ -22,6 +22,7 @@ EXAMPLES = {
         'left':  os.path.join(BASE_DIR, '..', 'example_3', 'ex3.cbl'),
         'right': os.path.join(BASE_DIR, '..', 'example_3', 'ex3.jcl'),
     },
+    'txt': os.path.join(BASE_DIR, '..', 'example_0', 'ex0.txt'),
 }
 
 @app.route('/')

@@ -191,3 +191,31 @@ document.getElementById('showLeft').onclick = function () {
 document.getElementById('showRight').onclick = function () {
   loadTxtIntoPane('right');
 };
+
+function renderGlossary(filter = '') {
+  const list = document.getElementById('keyword-list');
+  list.innerHTML = '';
+
+  Object.keys(KEYWORDS)
+    .filter(k => k.includes(filter.toUpperCase()))
+    .forEach(k => {
+      const div = document.createElement('div');
+      div.className = 'keyword-item';
+
+      if (pinned.has(k)) div.classList.add('pinned');
+
+      div.textContent = k;
+
+      div.onclick = () => {
+        pinned.has(k) ? pinned.delete(k) : pinned.add(k);
+        renderGlossary(filter);
+      };
+
+      div.onmouseover = e =>
+        showTip(e.clientX, e.clientY, KEYWORDS[k]);
+
+      div.onmouseout = hideTip;
+
+      list.appendChild(div);
+    });
+}

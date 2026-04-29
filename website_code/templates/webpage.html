@@ -20,6 +20,7 @@
       display: none;
       flex-direction: row;
       gap: 1rem;
+      
     }
     .pane {
       flex: 1;
@@ -48,6 +49,16 @@
   </style>
 </head>
 <body>
+
+<!-- ADD: Glossary Pane -->
+<div class="pane" id="glossary-pane">
+  <div class="pane-header">
+    <h3>Glossary</h3>
+    <input id="keyword-search" placeholder="Search..." />
+  </div>
+  <div id="keyword-list"></div>
+</div>
+
   <h1>Let's Learn COBOL</h1>
   <div id="example-controls">
     <label for="example-select">Choose an example:</label>
