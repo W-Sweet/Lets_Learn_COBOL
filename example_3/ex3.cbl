@@ -1,4 +1,4 @@
-      *------------------------------------------------------------*
+*------------------------------------------------------------*
       * PROGRAM:    EX3                                            *
       * LANGUAGE:   COBOL with Embedded DB2 SQL                   *
       * PURPOSE:    Retrieve a single employee record from the     *
@@ -107,12 +107,17 @@
  
       *------------------------------------------------------------*
        2000-DISPLAY-RESULTS.
-
       *------------------------------------------------------------*
-
+      *    Format and display the retrieved employee record.       *
+      *------------------------------------------------------------*
+           MOVE WS-EMP-SALARY TO WS-DISPLAY-SALARY
+           DISPLAY '--- EMPLOYEE RECORD ---'
+           DISPLAY 'EMP ID   : ' WS-EMP-ID
+           DISPLAY 'NAME     : ' WS-EMP-NAME
+           DISPLAY 'SALARY   : ' WS-DISPLAY-SALARY
+           DISPLAY 'DEPT     : ' WS-EMP-DEPT.
  
       *------------------------------------------------------------*
        9999-STOP-RUN.
       *------------------------------------------------------------*
            STOP RUN.
- 

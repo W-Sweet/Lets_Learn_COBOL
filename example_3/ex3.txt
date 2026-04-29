@@ -1,7 +1,36 @@
-This example demonstrates how a COBOL program connects to a relational database using embedded SQL,
-commonly known as DB2 SQL in mainframe environments. The JCL file (EX3.JCL) drives the process
-through three job steps: first the DB2 precompiler (DSNHPC) processes the COBOL source and replaces
-embedded SQL statements with CALL instructions while producing a Database Request Module (DBRM),
-then the IBM COBOL compiler and linker (IGYWCL) compile and link the precompiled source into an
-executable load module, and finally IKJEFT01 runs a DB2 BIND to register the DBRM into a plan
-before executing the program in batch.
+COBOL EX3 - EMPLOYEE LOOKUP PRIMER
+===================================
+KEY KEYWORDS & CONCEPTS
+------------------------
+EXEC SQL ... END-EXEC  - Marks a block of embedded DB2 SQL inside COBOL; the precompiler replaces it with a CALL before compilation
+INCLUDE SQLCA          - Inserts the SQL Communication Area into WORKING-STORAGE; DB2 fills this in after every SQL call
+SQLCODE                - Numeric return code inside the SQLCA: 0 = success, +100 = no row found, negative = error
+SELECT INTO            - Single-row SQL query that reads one matching row directly into host variables
+Host Variables (:name) - COBOL fields used inside SQL; the colon prefix tells the precompiler to treat them as variables, not column names
+EVALUATE TRUE          - COBOL's switch/case statement; used here to branch on SQLCODE after each SQL call
+88-level               - Condition name (boolean flag on a field); SQL-SUCCESS, SQL-NOT-FOUND, and SQL-ERROR make IF logic readable
+PIC / PICTURE          - Defines a field's type and size (X=alpha, 9=numeric, V=implied decimal, Z=zero-suppress for display)
+COMP-3                 - Packed-decimal storage format; two digits per byte, used for SALARY to save space
+PERFORM                - Calls a named paragraph; control returns to the next statement when the paragraph finishes
+MOVE                   - Assigns a value to a field; also triggers editing (comma insertion, zero suppression) when the target is a display PIC
+STOP RUN               - Terminates the COBOL program and returns control to the operating system
+--------------------------
+WHAT THE PROGRAM DOES
+--------------------------
+EX3 looks up a single employee in the DB2 EMPLOYEE table by a hardcoded ID ('E00100'),
+retrieves four columns — employee ID, last name, salary, and department code — and
+prints them to the screen. It is a classic singleton SELECT: one query, one row, no
+loop. After the SQL executes, SQLCODE is checked with EVALUATE TRUE to determine
+whether a row was found, no row matched, or a database error occurred. On success the
+salary is moved into an edited display field (adding commas and a decimal point) before
+all four fields are printed with labels. On any error the program displays a diagnostic
+message and stops immediately. The program is structured into four paragraphs following
+the standard COBOL open-process-close convention: 0000-MAIN controls overall flow,
+1000-FETCH-EMPLOYEE issues the SQL and evaluates the result, 2000-DISPLAY-RESULTS
+formats and prints the record, and 9999-STOP-RUN terminates the job.
+
+Before the program can run, three job steps in the JCL prepare it: the DB2 precompiler
+(DSNHPC) strips out the EXEC SQL blocks and produces a Database Request Module (DBRM),
+the COBOL compiler and linker (IGYWCL) turn the modified source into an executable load
+module, and finally IKJEFT01 runs a DB2 BIND to register the SQL access plan before
+executing the program in batch.
