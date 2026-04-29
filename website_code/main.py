@@ -34,11 +34,15 @@ def get_example(num):
     paths = EXAMPLES.get(str(num))
     if not paths:
         return jsonify({'error': 'Not found'}), 404
+
     result = {}
     for side, path in paths.items():
         with open(path, 'r') as f:
-            result[side] = {'name': os.path.basename(path), 'content': f.read()}
-    return jsonify(result)
+            result[side] = {
+                'name': os.path.basename(path),
+                'content': f.read()
+            }
 
+    return jsonify(result)
 if __name__ == '__main__':
     app.run(debug=True)

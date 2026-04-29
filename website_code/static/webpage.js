@@ -139,6 +139,10 @@ function loadExample(num) {
   xhr.send();
 }
 
+function getCurrentExample() {
+  return parseInt(select.value);
+}
+
 // ── Button listeners ───────────────────────────────────────────
 document.getElementById('showExample').addEventListener('click', function () {
   loadExample(select.value);
@@ -154,18 +158,36 @@ document.getElementById('nextExample').addEventListener('click', function () {
   loadExample(cur === 4 ? 1 : cur + 1);
 });
 
-document.getElementById('rotateLeft').addEventListener('click', function () {
-  if (!currentFiles.length) return;
-  let next = (leftIndex + 1) % currentFiles.length;
-  if (next === rightIndex) next = (next + 1) % currentFiles.length;
-  leftIndex = next;
-  renderPane('left', leftIndex);
-});
+function loadTxtIntoPane(side) {
+  let cur = parseInt(select.value) || 1;
+  let next = cur === 4 ? 1 : cur + 1;
 
-document.getElementById('rotateRight').addEventListener('click', function () {
-  if (!currentFiles.length) return;
-  let next = (rightIndex + 1) % currentFiles.length;
-  if (next === leftIndex) next = (next + 1) % currentFiles.length;
-  rightIndex = next;
-  renderPane('right', rightIndex);
-});
+  const xhr = new XMLHttpRequest();
+  xhr.open('GET', '/get-example/' + next, true);
+
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4 && xhr.status === 200) {
+      const data = JSON.parse(xhr.responseText);
+
+      const txtFile = data.txt;
+
+      const preEl = document.getElementById(side + '-content');
+      preEl.innerHTML = '';
+      preEl.appendChild(buildHoverableContent(txtFile.content));
+
+      document.getElementById(side + '-title').textContent = txtFile.name;
+    }
+  };
+
+  xhr.send();
+
+  select.value = next;
+}
+
+document.getElementById('showLeft').onclick = function () {
+  loadTxtIntoPane('left');
+};
+
+document.getElementById('showRight').onclick = function () {
+  loadTxtIntoPane('right');
+};
