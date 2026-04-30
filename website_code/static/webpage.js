@@ -1,221 +1,153 @@
-const select    = document.getElementById('example-select');
+const select = document.getElementById('example-select');
 const container = document.getElementById('text-container');
+let KEYWORDS = {};
 
-// ── COBOL keyword dictionary ───────────────────────────────────
-const KEYWORDS = {
-  'IDENTIFICATION': 'Starts the Identification Division — contains program metadata like PROGRAM-ID.',
-  'DIVISION':       'Marks the start of a major COBOL division (IDENTIFICATION, ENVIRONMENT, DATA, PROCEDURE).',
-  'PROGRAM-ID':     'Names the program. Must match the filename in most compilers.',
-  'ENVIRONMENT':    'Starts the Environment Division — describes the hardware/file environment.',
-  'DATA':           'Starts the Data Division — declares all variables, files, and working storage.',
-  'PROCEDURE':      'Starts the Procedure Division — contains the actual program logic.',
-  'DISPLAY':        'Writes text to the console/SYSOUT. e.g. DISPLAY "Hello World!".',
-  'STOP':           'Terminates program execution. STOP RUN ends the entire run unit.',
-  'RUN':            'Used with STOP (STOP RUN) to terminate the program.',
-};
-
-// ── Tooltip element ────────────────────────────────────────────
+// ── Tooltip Setup ──────────────────────────────────────────────
 const tooltip = document.createElement('div');
 tooltip.id = 'cobol-tooltip';
 Object.assign(tooltip.style, {
-  position:      'fixed',
-  background:    '#1e1e2e',
-  color:         '#cdd6f4',
-  padding:       '7px 11px',
-  borderRadius:  '6px',
-  fontSize:      '12.5px',
-  maxWidth:      '300px',
-  boxShadow:     '0 4px 16px rgba(0,0,0,0.45)',
-  zIndex:        '9999',
-  pointerEvents: 'none',
-  display:       'none',
-  lineHeight:    '1.5',
-  border:        '1px solid #45475a',
-  whiteSpace:    'pre-wrap',
+    position: 'fixed', background: '#1e1e2e', color: '#cdd6f4',
+    padding: '7px 11px', borderRadius: '6px', fontSize: '12.5px',
+    maxWidth: '300px', boxShadow: '0 4px 16px rgba(0,0,0,0.45)',
+    zIndex: '9999', pointerEvents: 'none', display: 'none',
+    lineHeight: '1.5', border: '1px solid #45475a', whiteSpace: 'pre-wrap'
 });
 document.body.appendChild(tooltip);
 
 let hideTimer = null;
 
+// ── Core Functionality ─────────────────────────────────────────
+async function fetchKeywords() {
+    const res = await fetch('/get-keywords');
+    KEYWORDS = await res.json();
+    renderGlossaryEditor();
+}
+
 function positionTooltip(x, y) {
-  tooltip.style.display = 'block';
-  const pad = 12;
-  const tw  = tooltip.offsetWidth;
-  const th  = tooltip.offsetHeight;
-  let tx = x + 14;
-  let ty = y - th - 10;
-  if (tx + tw > window.innerWidth  - pad) tx = x - tw - 14;
-  if (ty < pad)                           ty = y + 22;
-  tooltip.style.left = tx + 'px';
-  tooltip.style.top  = ty + 'px';
+    tooltip.style.display = 'block';
+    const tw = tooltip.offsetWidth, th = tooltip.offsetHeight;
+    let tx = x + 14, ty = y - th - 10;
+    if (tx + tw > window.innerWidth - 12) tx = x - tw - 14;
+    if (ty < 12) ty = y + 22;
+    tooltip.style.left = tx + 'px';
+    tooltip.style.top = ty + 'px';
 }
 
-function hideTooltip() {
-  tooltip.style.display = 'none';
-}
-
-// ── Tokenise content into hoverable spans ──────────────────────
 function buildHoverableContent(text) {
-  const fragment = document.createDocumentFragment();
-  text.split('\n').forEach((line, i) => {
-    if (i > 0) fragment.appendChild(document.createTextNode('\n'));
-    const parts = line.split(/(\s+|[(),;.]+)/);
-    parts.forEach(part => {
-      if (!part) return;
-      if (/^\s+$/.test(part) || /^[(),;.]+$/.test(part)) {
-        fragment.appendChild(document.createTextNode(part));
-        return;
-      }
-      const tip = KEYWORDS[part.toUpperCase()];
-      if (tip) {
-        const span = document.createElement('span');
-        span.textContent = part;
-        span.className   = 'tok tok-known';
-        span.dataset.tip = tip;
-        fragment.appendChild(span);
-      } else {
-        fragment.appendChild(document.createTextNode(part));
-      }
+    const fragment = document.createDocumentFragment();
+    text.split('\n').forEach((line, i) => {
+        if (i > 0) fragment.appendChild(document.createTextNode('\n'));
+        const parts = line.split(/(\s+|[(),;.]+)/);
+        parts.forEach(part => {
+            if (!part || /^\s+$/.test(part) || /^[(),;.]+$/.test(part)) {
+                fragment.appendChild(document.createTextNode(part));
+                return;
+            }
+            const tip = KEYWORDS[part.toUpperCase()];
+            if (tip) {
+                const span = document.createElement('span');
+                span.textContent = part;
+                span.className = 'tok tok-known';
+                span.dataset.tip = tip;
+                fragment.appendChild(span);
+            } else {
+                fragment.appendChild(document.createTextNode(part));
+            }
+        });
     });
-  });
-  return fragment;
+    return fragment;
 }
 
-// ── Attach hover listeners to a <pre> element ─────────────────
 function attachHoverListeners(preEl) {
-  preEl.addEventListener('mouseover', function (e) {
-    const span = e.target.closest('.tok-known');
-    if (!span) return;
-    clearTimeout(hideTimer);
-    tooltip.textContent = span.dataset.tip;
-    positionTooltip(e.clientX, e.clientY);
-  });
-
-  preEl.addEventListener('mousemove', function (e) {
-    if (e.target.closest('.tok-known') && tooltip.style.display !== 'none') {
-      positionTooltip(e.clientX, e.clientY);
-    }
-  });
-
-  preEl.addEventListener('mouseout', function (e) {
-    if (e.target.closest('.tok-known')) {
-      hideTimer = setTimeout(hideTooltip, 120);
-    }
-  });
-}
-
-// ── State ──────────────────────────────────────────────────────
-let currentFiles = [];
-let leftIndex    = 0;
-let rightIndex   = 1;
-
-// ── Render a pane with hoverable keywords ─────────────────────
-function renderPane(side, index) {
-  const file = currentFiles[index];
-  if (!file) return;
-  document.getElementById(side + '-title').textContent = file.name;
-  const preEl = document.getElementById(side + '-content');
-  preEl.innerHTML = '';
-  preEl.appendChild(buildHoverableContent(file.content));
-  attachHoverListeners(preEl);
-}
-
-function loadExample(num) {
-  if (!num) return;
-  select.value = num;
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', '/get-example/' + num, true);
-  xhr.onreadystatechange = function () {
-    if (xhr.readyState === 4 && xhr.status === 200) {
-      const data   = JSON.parse(xhr.responseText);
-      currentFiles = [data.left, data.right];
-      leftIndex    = 0;
-      rightIndex   = 1;
-      renderPane('left',  leftIndex);
-      renderPane('right', rightIndex);
-      container.style.display = 'flex';
-    }
-  };
-  xhr.send();
-}
-
-function getCurrentExample() {
-  return parseInt(select.value);
-}
-
-// ── Button listeners ───────────────────────────────────────────
-document.getElementById('showExample').addEventListener('click', function () {
-  loadExample(select.value);
-});
-
-document.getElementById('prevExample').addEventListener('click', function () {
-  var cur = parseInt(select.value) || 2;
-  loadExample(cur === 1 ? 4 : cur - 1);
-});
-
-document.getElementById('nextExample').addEventListener('click', function () {
-  var cur = parseInt(select.value) || 0;
-  loadExample(cur === 4 ? 1 : cur + 1);
-});
-
-function loadTxtIntoPane(side) {
-  let cur = parseInt(select.value) || 1;
-  let next = cur === 4 ? 1 : cur + 1;
-
-  const xhr = new XMLHttpRequest();
-  xhr.open('GET', '/get-example/' + next, true);
-
-  xhr.onreadystatechange = function () {
-    if (xhr.readyState === 4 && xhr.status === 200) {
-      const data = JSON.parse(xhr.responseText);
-
-      const txtFile = data.txt;
-
-      const preEl = document.getElementById(side + '-content');
-      preEl.innerHTML = '';
-      preEl.appendChild(buildHoverableContent(txtFile.content));
-
-      document.getElementById(side + '-title').textContent = txtFile.name;
-    }
-  };
-
-  xhr.send();
-
-  select.value = next;
-}
-
-document.getElementById('showLeft').onclick = function () {
-  loadTxtIntoPane('left');
-};
-
-document.getElementById('showRight').onclick = function () {
-  loadTxtIntoPane('right');
-};
-
-function renderGlossary(filter = '') {
-  const list = document.getElementById('keyword-list');
-  list.innerHTML = '';
-
-  Object.keys(KEYWORDS)
-    .filter(k => k.includes(filter.toUpperCase()))
-    .forEach(k => {
-      const div = document.createElement('div');
-      div.className = 'keyword-item';
-
-      if (pinned.has(k)) div.classList.add('pinned');
-
-      div.textContent = k;
-
-      div.onclick = () => {
-        pinned.has(k) ? pinned.delete(k) : pinned.add(k);
-        renderGlossary(filter);
-      };
-
-      div.onmouseover = e =>
-        showTip(e.clientX, e.clientY, KEYWORDS[k]);
-
-      div.onmouseout = hideTip;
-
-      list.appendChild(div);
+    preEl.addEventListener('mouseover', (e) => {
+        const span = e.target.closest('.tok-known');
+        if (!span) return;
+        clearTimeout(hideTimer);
+        tooltip.textContent = span.dataset.tip;
+        positionTooltip(e.clientX, e.clientY);
+    });
+    preEl.addEventListener('mousemove', (e) => {
+        if (tooltip.style.display !== 'none') positionTooltip(e.clientX, e.clientY);
+    });
+    preEl.addEventListener('mouseout', () => {
+        hideTimer = setTimeout(() => tooltip.style.display = 'none', 120);
     });
 }
+
+// ── CRUD Admin Logic ───────────────────────────────────────────
+function renderGlossaryEditor() {
+    const list = document.getElementById('keyword-admin-list');
+    if (!list) return;
+    list.innerHTML = '';
+    Object.entries(KEYWORDS).forEach(([key, val]) => {
+        const row = document.createElement('div');
+        row.className = 'admin-row';
+        row.innerHTML = `
+            <input type="text" value="${key}" class="key-edit" readonly>
+            <input type="text" value="${val}" class="val-edit">
+            <button onclick="deleteKey('${key}')">Delete</button>
+        `;
+        list.appendChild(row);
+    });
+}
+
+function addKeyword() {
+    const k = document.getElementById('new-key').value.toUpperCase();
+    const v = document.getElementById('new-val').value;
+    if (k && v) {
+        KEYWORDS[k] = v;
+        renderGlossaryEditor();
+    }
+}
+
+function deleteKey(k) {
+    delete KEYWORDS[k];
+    renderGlossaryEditor();
+}
+
+async function saveKeywords() {
+    // Collect values from inputs
+    const rows = document.querySelectorAll('.admin-row');
+    const updated = {};
+    rows.forEach(row => {
+        const k = row.querySelector('.key-edit').value;
+        const v = row.querySelector('.val-edit').value;
+        updated[k] = v;
+    });
+    
+    const res = await fetch('/update-keywords', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(updated)
+    });
+    if (res.ok) alert("Glossary Updated!");
+    fetchKeywords();
+}
+
+// ── Navigation ────────────────────────────────────────────────
+function loadExample(num) {
+    if (!num) return;
+    fetch('/get-example/' + num)
+        .then(res => res.json())
+        .then(data => {
+            renderPane('left', data.left);
+            renderPane('right', data.right);
+            container.style.display = 'flex';
+        });
+}
+
+function renderPane(side, file) {
+    document.getElementById(side + '-title').textContent = file.name;
+    const pre = document.getElementById(side + '-content');
+    pre.innerHTML = '';
+    pre.appendChild(buildHoverableContent(file.content));
+    attachHoverListeners(pre);
+}
+
+document.getElementById('showExample').onclick = () => loadExample(select.value);
+document.getElementById('toggleAdmin').onclick = () => {
+    const el = document.getElementById('admin-panel');
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+};
+
+fetchKeywords();
