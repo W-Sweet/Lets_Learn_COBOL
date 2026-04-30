@@ -18,7 +18,7 @@ if not os.path.exists(GLOSSARY_FILE):
         json.dump(initial_data, f, indent=4)
 
 EXAMPLES = {
-    '1': {'left': os.path.join(BASE_DIR, '..', 'example_0', 'ex0.cbl'), 'right': os.path.join(BASE_DIR, '..', 'example_0', 'ex0.jcl')},
+    '1': {'left': os.path.join(BASE_DIR, '..', 'example_0', 'ex0.cbl'), 'right': os.path.join(BASE_DIR, '..', 'example_0', 'ex0.jcl'), },
     '2': {'left': os.path.join(BASE_DIR, '..', 'example_1', 'ex1.cbl'), 'right': os.path.join(BASE_DIR, '..', 'example_1', 'ex1.jcl')},
     '3': {'left': os.path.join(BASE_DIR, '..', 'example_2', 'ex2.cbl'), 'right': os.path.join(BASE_DIR, '..', 'example_2', 'ex2.jcl')},
     '4': {'left': os.path.join(BASE_DIR, '..', 'example_3', 'ex3.cbl'), 'right': os.path.join(BASE_DIR, '..', 'example_3', 'ex3.jcl')},
@@ -42,6 +42,19 @@ def update_keywords():
         return jsonify({'status': 'success'})
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@app.route('/get-txt/<int:num>/<side>') #pick back up here, showing the content of the txt file when the user clicks on the "View TXT" button for an example, specifically the ex.txts
+def get_txt(num, side):
+    paths = EXAMPLES.get(str(num))
+    if not paths or side not in ('left', 'right'):
+        return jsonify({'error': 'Not found'}), 404
+    key = f'{side}_txt'
+    path = paths.get(key)
+    try:
+        with open(path, 'r') as f:
+            return jsonify({'name': os.path.basename(path), 'content': f.read()})
+    except FileNotFoundError:
+        return jsonify({'error': 'TXT file not found'}), 404
 
 @app.route('/get-example/<int:num>')
 def get_example(num):
